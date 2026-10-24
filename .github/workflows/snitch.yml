@@ -1,0 +1,48 @@
+name: "Snitch network audit"
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main", "develop" ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  SNITCH_VERSION: "0.2.2"
+  SNITCH_SHA256: "2f96c67306bade30270fb424f462f4d00e4d33112c946fec0c4511efc6e3dce1"
+
+jobs:
+  snitch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+    - uses: actions/checkout@v4
+
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 22
+
+    - name: Install modules
+      run: npm ci
+
+    - name: Build app
+      run: npm run build
+
+    - name: Install snitch
+      run: |
+        curl -sSfL -o snitch.tar.gz "https://github.com/karol-broda/snitch/releases/download/v${SNITCH_VERSION}/snitch_${SNITCH_VERSION}_linux_amd64.tar.gz"
+        echo "${SNITCH_SHA256}  snitch.tar.gz" | sha256sum -c -
+        mkdir -p "$RUNNER_TEMP/snitch" && tar -xzf snitch.tar.gz -C "$RUNNER_TEMP/snitch" snitch
+        echo "SNITCH_BIN=$RUNNER_TEMP/snitch/snitch" >> "$GITHUB_ENV"
+
+    - name: Run app and audit network connections
+      run: xvfb-run -a node scripts/snitch/snitch-check.mjs --duration 30 --report snitch-report.json
+
+    - name: Upload report
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: snitch-report
+        path: snitch-report.json

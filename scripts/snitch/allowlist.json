@@ -1,0 +1,12 @@
+{
+    "allowDns": true,
+    "allowed": [
+        { "host": "guardrail.branta.pro", "reason": "payment verification API (production)" },
+        { "host": "staging.branta.pro", "reason": "payment verification API (developer mode)" }
+    ],
+    "knownIssues": [
+        { "host": "fonts.googleapis.com", "reason": "Google Fonts stylesheet linked from src/index.html; bundle fonts locally to remove" },
+        { "host": "fonts.gstatic.com", "reason": "Google Fonts files inlined by the Angular build from src/index.html; bundle fonts locally to remove" },
+        { "host": "*.gvt1.com", "reason": "Chromium spellchecker dictionary download; disable with webPreferences.spellcheck=false or session.setSpellCheckerDictionaryDownloadURL" }
+    ]
+}

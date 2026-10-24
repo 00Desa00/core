@@ -20,7 +20,8 @@
     "snap": "npm run build && electron-builder --linux snap",
     "test:watch": "jest --watch",
     "test": "jest",
-    "lint": "ng lint"
+    "lint": "ng lint",
+    "snitch": "node scripts/snitch/snitch-check.mjs"
   },
   "build": {
     "appId": "pro.branta",
